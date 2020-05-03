@@ -41,8 +41,6 @@ func Authorization(accessToken string) *AuthorizationResponse {
 	return nil
 }
 
-
-
 func setupAuthorizationRequest(accessToken string) *resty.Request {
 	request := resty.New().R()
 
