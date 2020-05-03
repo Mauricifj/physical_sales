@@ -1,0 +1,3 @@
+authentication:
+  baseurl: https://authsandbox.braspag.com.br
+  oauth: /oauth2/token
