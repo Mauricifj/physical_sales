@@ -2,5 +2,7 @@ package main
 
 func main() {
 	OAuthResponse := GetAccessToken()
-	Authorization(OAuthResponse.AccessToken)
+	AuthorizationResponse := Authorization(OAuthResponse.AccessToken)
+	Confirmation(OAuthResponse.AccessToken, AuthorizationResponse.Payment.PaymentId)
+
 }

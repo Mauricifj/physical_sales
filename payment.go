@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"strings"
 )
 
 func Authorization(accessToken string) *AuthorizationResponse {
@@ -90,4 +91,47 @@ type Payment struct {
 	Status int `json:"Status"`
 	ReturnMessage string `json:"ReturnMessage"`
 	PaymentId string `json:"PaymentId"`
+}
+
+func Confirmation(accessToken string, paymentId string) *ConfirmationResponse {
+	configurations := GetConfigurations()
+
+	request := setupConfirmationRequest(accessToken)
+
+	url := configurations.Payment.BaseUrl + strings.Replace(configurations.Payment.Confirmation, "PaymentId", paymentId, -1)
+
+	response, err := request.Put(url)
+
+	if err != nil {
+		panic(fmt.Errorf("Fatal error on confirmation request: %s \n", err))
+	}
+
+	ConfirmationResponse := response.Result().(*ConfirmationResponse)
+
+	fmt.Println("CONFIRMATION STEP")
+	fmt.Println(" - ConfirmationStatus:", ConfirmationResponse.ConfirmationStatus)
+	fmt.Println(" - Status:", ConfirmationResponse.Status)
+	fmt.Println(" - ReturnMessage:", ConfirmationResponse.ReturnMessage)
+	fmt.Println()
+
+	return ConfirmationResponse
+}
+
+func setupConfirmationRequest(accessToken string) *resty.Request {
+	request := resty.New().R()
+
+	request.SetAuthToken(accessToken)
+	request.SetHeaders(map[string]string{
+		"Content-Type": "application/json",
+	})
+	request.SetBody("{}")
+	request.SetResult(ConfirmationResponse{})
+
+	return request
+}
+
+type ConfirmationResponse struct {
+	ConfirmationStatus int `json:"ConfirmationStatus"`
+	Status int `json:"Status"`
+	ReturnMessage string `json:"ReturnMessage"`
 }
