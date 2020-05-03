@@ -135,3 +135,56 @@ type ConfirmationResponse struct {
 	Status int `json:"Status"`
 	ReturnMessage string `json:"ReturnMessage"`
 }
+
+func Void(accessToken string, paymentId string) *VoidResponse {
+	configurations := GetConfigurations()
+
+	request := setupVoidRequest(accessToken)
+
+	url := configurations.Payment.BaseUrl + strings.Replace(configurations.Payment.Void, "PaymentId", paymentId, -1)
+
+	response, err := request.Post(url)
+
+	if err != nil {
+		panic(fmt.Errorf("Fatal error on void request: %s \n", err))
+	}
+
+	VoidResponse := response.Result().(*VoidResponse)
+
+	fmt.Println("VOID STEP")
+	fmt.Println(" - VoidId:", VoidResponse.VoidId)
+	fmt.Println(" - CancellationStatus:", VoidResponse.CancellationStatus)
+	fmt.Println(" - Status:", VoidResponse.Status)
+	fmt.Println(" - ReturnMessage:", VoidResponse.ReturnMessage)
+	fmt.Println()
+
+	return VoidResponse
+}
+
+func setupVoidRequest(accessToken string) *resty.Request {
+	request := resty.New().R()
+
+	request.SetAuthToken(accessToken)
+	request.SetHeaders(map[string]string{
+		"Content-Type": "application/json",
+	})
+	voidPayload := `{
+		"MerchantVoidId": 2019042204,
+		"MerchantVoidDate": "2019-04-15T12:00:00Z",
+		"Card": {
+			"InputMode": "Typed",
+			"CardNumber": 5432123454321234
+		}
+	}`
+	request.SetBody(voidPayload)
+	request.SetResult(VoidResponse{})
+
+	return request
+}
+
+type VoidResponse struct {
+	VoidId string `json:"VoidId"`
+	CancellationStatus int `json:"CancellationStatus"`
+	Status int `json:"Status"`
+	ReturnMessage string `json:"ReturnMessage"`
+}
