@@ -17,7 +17,7 @@ type Configuration struct {
 		Authorization string `yaml:Authorization`
 		Confirmation  string `yaml:confirmation`
 		Void          string `yaml:void`
-		UndoVoid      string `yaml:undo_void`
+		UndoVoid      string `yaml:undovoid`
 	}`yaml:payment`
 }
 

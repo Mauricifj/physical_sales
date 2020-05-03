@@ -7,4 +7,4 @@ payment:
   authorization: /1/physicalSales
   confirmation: /1/physicalSales/PaymentId/confirmation
   void: /1/physicalSales/PaymentId/voids
-  undo_void: /1/physicalSales/PaymentId/voids/VoidId
+  undovoid: /1/physicalSales/PaymentId/voids/VoidId
