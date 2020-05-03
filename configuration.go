@@ -11,6 +11,14 @@ type Configuration struct {
 		BaseUrl string `yaml:baseurl`
 		OAuth   string `yaml:oauth`
 	}`yaml:authentication`
+
+	Payment struct{
+		BaseUrl       string `yaml:baseurl`
+		Authorization string `yaml:Authorization`
+		Confirmation  string `yaml:confirmation`
+		Void          string `yaml:void`
+		UndoVoid      string `yaml:undo_void`
+	}`yaml:payment`
 }
 
 func GetConfigurations() *Configuration {

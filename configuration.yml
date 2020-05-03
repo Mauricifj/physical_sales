@@ -1,3 +1,10 @@
 authentication:
   baseurl: https://authsandbox.braspag.com.br
   oauth: /oauth2/token
+
+payment:
+  baseurl: https://apisandbox.cieloecommerce.cielo.com.br
+  authorization: /1/physicalSales
+  confirmation: /1/physicalSales/PaymentId/confirmation
+  void: /1/physicalSales/PaymentId/voids
+  undo_void: /1/physicalSales/PaymentId/voids/VoidId

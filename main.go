@@ -1,8 +1,6 @@
 package main
 
-import "fmt"
-
 func main() {
-	oauthResponse := GetAccessToken()
-	fmt.Println(oauthResponse.AccessToken)
+	OAuthResponse := GetAccessToken()
+	Authorization(OAuthResponse.AccessToken)
 }
