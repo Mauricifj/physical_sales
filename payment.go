@@ -109,6 +109,7 @@ func Confirmation(accessToken string, paymentId string) *ConfirmationResponse {
 	ConfirmationResponse := response.Result().(*ConfirmationResponse)
 
 	fmt.Println("CONFIRMATION STEP")
+	fmt.Println(" - PaymentId:", paymentId)
 	fmt.Println(" - ConfirmationStatus:", ConfirmationResponse.ConfirmationStatus)
 	fmt.Println(" - Status:", ConfirmationResponse.Status)
 	fmt.Println(" - ReturnMessage:", ConfirmationResponse.ReturnMessage)
@@ -152,6 +153,7 @@ func Void(accessToken string, paymentId string) *VoidResponse {
 	VoidResponse := response.Result().(*VoidResponse)
 
 	fmt.Println("VOID STEP")
+	fmt.Println(" - PaymentId:", paymentId)
 	fmt.Println(" - VoidId:", VoidResponse.VoidId)
 	fmt.Println(" - CancellationStatus:", VoidResponse.CancellationStatus)
 	fmt.Println(" - Status:", VoidResponse.Status)
@@ -184,6 +186,53 @@ func setupVoidRequest(accessToken string) *resty.Request {
 
 type VoidResponse struct {
 	VoidId string `json:"VoidId"`
+	CancellationStatus int `json:"CancellationStatus"`
+	Status int `json:"Status"`
+	ReturnMessage string `json:"ReturnMessage"`
+}
+
+func UndoVoid(accessToken string, paymentId string, voidId string) *UndoVoidResponse {
+	configurations := GetConfigurations()
+
+	request := setupUndoVoidRequest(accessToken)
+
+	paymentIdReplaced := strings.Replace(configurations.Payment.UndoVoid, "PaymentId", paymentId, -1)
+	voidIdReplaced := strings.Replace(paymentIdReplaced, "VoidId", voidId, -1)
+
+	url := configurations.Payment.BaseUrl + voidIdReplaced
+
+	response, err := request.Delete(url)
+
+	if err != nil {
+		panic(fmt.Errorf("Fatal error on undo void request: %s \n", err))
+	}
+
+	UndoVoidResponse := response.Result().(*UndoVoidResponse)
+
+	fmt.Println("UNDO VOID STEP")
+	fmt.Println(" - PaymentId:", paymentId)
+	fmt.Println(" - VoidId:", voidId)
+	fmt.Println(" - CancellationStatus:", UndoVoidResponse.CancellationStatus)
+	fmt.Println(" - Status:", UndoVoidResponse.Status)
+	fmt.Println(" - ReturnMessage:", UndoVoidResponse.ReturnMessage)
+	fmt.Println()
+
+	return UndoVoidResponse
+}
+
+func setupUndoVoidRequest(accessToken string) *resty.Request {
+	request := resty.New().R()
+
+	request.SetAuthToken(accessToken)
+	request.SetHeaders(map[string]string{
+		"Content-Type": "application/json",
+	})
+	request.SetResult(UndoVoidResponse{})
+
+	return request
+}
+
+type UndoVoidResponse struct {
 	CancellationStatus int `json:"CancellationStatus"`
 	Status int `json:"Status"`
 	ReturnMessage string `json:"ReturnMessage"`
