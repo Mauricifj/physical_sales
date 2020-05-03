@@ -19,20 +19,29 @@ func Authorization(accessToken string) *AuthorizationResponse {
 		panic(fmt.Errorf("Fatal error on authorization request: %s \n", err))
 	}
 
-	AuthorizationResponse := response.Result().(*AuthorizationResponse)
+	CheckStatusCode(response)
 
-	fmt.Println("AUTHORIZATION STEP")
-	fmt.Println(" - MerchantOrderId:", AuthorizationResponse.MerchantOrderId)
-	fmt.Println(" - Amount:", AuthorizationResponse.Payment.Amount)
-	fmt.Println(" - ReceivedDate:", AuthorizationResponse.Payment.ReceivedDate)
-	fmt.Println(" - CapturedDate:", AuthorizationResponse.Payment.CapturedDate)
-	fmt.Println(" - Status:", AuthorizationResponse.Payment.Status)
-	fmt.Println(" - ReturnMessage:", AuthorizationResponse.Payment.ReturnMessage)
-	fmt.Println(" - PaymentId:", AuthorizationResponse.Payment.PaymentId)
-	fmt.Println()
+	if response.StatusCode() == 201 {
+		AuthorizationResponse := response.Result().(*AuthorizationResponse)
 
-	return AuthorizationResponse
+		fmt.Println("AUTHORIZATION STEP")
+		fmt.Println(" - MerchantOrderId:", AuthorizationResponse.MerchantOrderId)
+		fmt.Println(" - Amount:", AuthorizationResponse.Payment.Amount)
+		fmt.Println(" - ReceivedDate:", AuthorizationResponse.Payment.ReceivedDate)
+		fmt.Println(" - CapturedDate:", AuthorizationResponse.Payment.CapturedDate)
+		fmt.Println(" - Status:", AuthorizationResponse.Payment.Status)
+		fmt.Println(" - ReturnMessage:", AuthorizationResponse.Payment.ReturnMessage)
+		fmt.Println(" - PaymentId:", AuthorizationResponse.Payment.PaymentId)
+		fmt.Println()
+
+		return AuthorizationResponse
+	}
+
+	fmt.Println("Error on authorizing payment")
+	return nil
 }
+
+
 
 func setupAuthorizationRequest(accessToken string) *resty.Request {
 	request := resty.New().R()
@@ -80,17 +89,17 @@ func setupAuthorizationRequest(accessToken string) *resty.Request {
 }
 
 type AuthorizationResponse struct {
-	MerchantOrderId string `json:"MerchantOrderId"`
-	Payment Payment `json:"Payment"`
+	MerchantOrderId string  `json:"MerchantOrderId"`
+	Payment         Payment `json:"Payment"`
 }
 
 type Payment struct {
-	Amount int `json:"Amount"`
-	ReceivedDate string `json:"ReceivedDate"`
-	CapturedDate string `json:"CapturedDate"`
-	Status int `json:"Status"`
+	Amount        int    `json:"Amount"`
+	ReceivedDate  string `json:"ReceivedDate"`
+	CapturedDate  string `json:"CapturedDate"`
+	Status        int    `json:"Status"`
 	ReturnMessage string `json:"ReturnMessage"`
-	PaymentId string `json:"PaymentId"`
+	PaymentId     string `json:"PaymentId"`
 }
 
 func Confirmation(accessToken string, paymentId string) *ConfirmationResponse {
@@ -106,16 +115,22 @@ func Confirmation(accessToken string, paymentId string) *ConfirmationResponse {
 		panic(fmt.Errorf("Fatal error on confirmation request: %s \n", err))
 	}
 
-	ConfirmationResponse := response.Result().(*ConfirmationResponse)
+	CheckStatusCode(response)
 
-	fmt.Println("CONFIRMATION STEP")
-	fmt.Println(" - PaymentId:", paymentId)
-	fmt.Println(" - ConfirmationStatus:", ConfirmationResponse.ConfirmationStatus)
-	fmt.Println(" - Status:", ConfirmationResponse.Status)
-	fmt.Println(" - ReturnMessage:", ConfirmationResponse.ReturnMessage)
-	fmt.Println()
+	if response.StatusCode() == 200 {
+		ConfirmationResponse := response.Result().(*ConfirmationResponse)
 
-	return ConfirmationResponse
+		fmt.Println("CONFIRMATION STEP")
+		fmt.Println(" - PaymentId:", paymentId)
+		fmt.Println(" - ConfirmationStatus:", ConfirmationResponse.ConfirmationStatus)
+		fmt.Println(" - Status:", ConfirmationResponse.Status)
+		fmt.Println(" - ReturnMessage:", ConfirmationResponse.ReturnMessage)
+		fmt.Println()
+
+		return ConfirmationResponse
+	}
+	fmt.Println("Error on confirming payment")
+	return nil
 }
 
 func setupConfirmationRequest(accessToken string) *resty.Request {
@@ -132,9 +147,9 @@ func setupConfirmationRequest(accessToken string) *resty.Request {
 }
 
 type ConfirmationResponse struct {
-	ConfirmationStatus int `json:"ConfirmationStatus"`
-	Status int `json:"Status"`
-	ReturnMessage string `json:"ReturnMessage"`
+	ConfirmationStatus int    `json:"ConfirmationStatus"`
+	Status             int    `json:"Status"`
+	ReturnMessage      string `json:"ReturnMessage"`
 }
 
 func Void(accessToken string, paymentId string) *VoidResponse {
@@ -150,17 +165,23 @@ func Void(accessToken string, paymentId string) *VoidResponse {
 		panic(fmt.Errorf("Fatal error on void request: %s \n", err))
 	}
 
-	VoidResponse := response.Result().(*VoidResponse)
+	CheckStatusCode(response)
 
-	fmt.Println("VOID STEP")
-	fmt.Println(" - PaymentId:", paymentId)
-	fmt.Println(" - VoidId:", VoidResponse.VoidId)
-	fmt.Println(" - CancellationStatus:", VoidResponse.CancellationStatus)
-	fmt.Println(" - Status:", VoidResponse.Status)
-	fmt.Println(" - ReturnMessage:", VoidResponse.ReturnMessage)
-	fmt.Println()
+	if response.StatusCode() == 201 {
+		VoidResponse := response.Result().(*VoidResponse)
 
-	return VoidResponse
+		fmt.Println("VOID STEP")
+		fmt.Println(" - PaymentId:", paymentId)
+		fmt.Println(" - VoidId:", VoidResponse.VoidId)
+		fmt.Println(" - CancellationStatus:", VoidResponse.CancellationStatus)
+		fmt.Println(" - Status:", VoidResponse.Status)
+		fmt.Println(" - ReturnMessage:", VoidResponse.ReturnMessage)
+		fmt.Println()
+
+		return VoidResponse
+	}
+	fmt.Println("Error on voiding payment")
+	return nil
 }
 
 func setupVoidRequest(accessToken string) *resty.Request {
@@ -185,10 +206,10 @@ func setupVoidRequest(accessToken string) *resty.Request {
 }
 
 type VoidResponse struct {
-	VoidId string `json:"VoidId"`
-	CancellationStatus int `json:"CancellationStatus"`
-	Status int `json:"Status"`
-	ReturnMessage string `json:"ReturnMessage"`
+	VoidId             string `json:"VoidId"`
+	CancellationStatus int    `json:"CancellationStatus"`
+	Status             int    `json:"Status"`
+	ReturnMessage      string `json:"ReturnMessage"`
 }
 
 func UndoVoid(accessToken string, paymentId string, voidId string) *UndoVoidResponse {
@@ -207,17 +228,23 @@ func UndoVoid(accessToken string, paymentId string, voidId string) *UndoVoidResp
 		panic(fmt.Errorf("Fatal error on undo void request: %s \n", err))
 	}
 
-	UndoVoidResponse := response.Result().(*UndoVoidResponse)
+	CheckStatusCode(response)
 
-	fmt.Println("UNDO VOID STEP")
-	fmt.Println(" - PaymentId:", paymentId)
-	fmt.Println(" - VoidId:", voidId)
-	fmt.Println(" - CancellationStatus:", UndoVoidResponse.CancellationStatus)
-	fmt.Println(" - Status:", UndoVoidResponse.Status)
-	fmt.Println(" - ReturnMessage:", UndoVoidResponse.ReturnMessage)
-	fmt.Println()
+	if response.StatusCode() == 200 {
+		UndoVoidResponse := response.Result().(*UndoVoidResponse)
 
-	return UndoVoidResponse
+		fmt.Println("UNDO VOID STEP")
+		fmt.Println(" - PaymentId:", paymentId)
+		fmt.Println(" - VoidId:", voidId)
+		fmt.Println(" - CancellationStatus:", UndoVoidResponse.CancellationStatus)
+		fmt.Println(" - Status:", UndoVoidResponse.Status)
+		fmt.Println(" - ReturnMessage:", UndoVoidResponse.ReturnMessage)
+		fmt.Println()
+
+		return UndoVoidResponse
+	}
+	fmt.Println("Error on undoing void of payment")
+	return nil
 }
 
 func setupUndoVoidRequest(accessToken string) *resty.Request {
@@ -233,7 +260,23 @@ func setupUndoVoidRequest(accessToken string) *resty.Request {
 }
 
 type UndoVoidResponse struct {
-	CancellationStatus int `json:"CancellationStatus"`
-	Status int `json:"Status"`
-	ReturnMessage string `json:"ReturnMessage"`
+	CancellationStatus int    `json:"CancellationStatus"`
+	Status             int    `json:"Status"`
+	ReturnMessage      string `json:"ReturnMessage"`
+}
+
+func CheckStatusCode(response *resty.Response) {
+	switch response.StatusCode() {
+	case 400:
+		panic(fmt.Errorf("Error with contract: %s \n", response.Status()))
+
+	case 401:
+		panic(fmt.Errorf("Error with credentials: %s \n", response.Status()))
+
+	case 403:
+		panic(fmt.Errorf("Operation not allowed: %s \n", response.Status()))
+
+	case 404:
+		panic(fmt.Errorf("Not found or undone: %s \n", response.Status()))
+	}
 }

@@ -20,15 +20,27 @@ func GetAccessToken() *OAuthResponse {
 		panic(fmt.Errorf("Fatal error on oauth request: %s \n", err))
 	}
 
-	OAuthResponse := response.Result().(*OAuthResponse)
+	if response.StatusCode() == 400 {
+		panic(fmt.Errorf("Error with credentials: %s \n", response.Status()))
+	}
 
-	fmt.Println("AUTHENTICATION STEP")
-	fmt.Println(" - access_token:", OAuthResponse.AccessToken[0:60], "...")
-	fmt.Println(" - token_type:", OAuthResponse.TokenType)
-	fmt.Println(" - expires_in:", OAuthResponse.ExpiresIn)
-	fmt.Println()
+	if response.StatusCode() == 500 {
+		panic(fmt.Errorf("Internal server error: %s \n", response.Status()))
+	}
 
-	return OAuthResponse
+	if response.StatusCode() == 200 {
+		OAuthResponse := response.Result().(*OAuthResponse)
+
+		fmt.Println("AUTHENTICATION STEP")
+		fmt.Println(" - access_token:", OAuthResponse.AccessToken[0:60], "...")
+		fmt.Println(" - token_type:", OAuthResponse.TokenType)
+		fmt.Println(" - expires_in:", OAuthResponse.ExpiresIn)
+		fmt.Println()
+
+		return OAuthResponse
+	}
+	fmt.Println("Error on getting access token")
+	return nil
 }
 
 func setupOAuthRequest() *resty.Request {
