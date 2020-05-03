@@ -24,6 +24,7 @@ func GetAccessToken() *OAuthResponse {
 	fmt.Println(" - access_token:", OAuthResponse.AccessToken[0:60], "...")
 	fmt.Println(" - token_type:", OAuthResponse.TokenType)
 	fmt.Println(" - expires_in:", OAuthResponse.ExpiresIn)
+	fmt.Println()
 
 	return OAuthResponse
 }
